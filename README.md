@@ -40,7 +40,7 @@ npm install
 
 ### Configurazione del file .env
 Crea un file .env nella radice del progetto seguendo le indicazioni fornite in .env.example, inserendo i tuoi dati di configurazione per il database e le chiavi segrete:
-# Esempio di contenuto per .env
+##### Esempio di contenuto per .env
 ```bash
 JWT_SECRET=tua_chiave_segreta
 DATABASE_URL=url_database
