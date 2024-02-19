@@ -60,7 +60,8 @@ npm start
 ```
 
 ### Contatti
-Per qualsiasi domanda o suggerimento, sentiti libero di contattarmi all'indirizzo a.rondolini.dev@gmail.com
+Per qualsiasi domanda o suggerimento, sentiti libero di contattarmi all'indirizzo a.rondolini.dev@gmail.com.
+Tieni a mente che è il mio primo progetto node e qualsiasi consiglio è ben accetto!
 
 
 
