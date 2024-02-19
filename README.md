@@ -40,10 +40,15 @@ npm install
 Crea un file .env nella radice del progetto seguendo le indicazioni fornite in .env.example, inserendo i tuoi dati di configurazione per il database e le chiavi segrete:
 # Esempio di contenuto per .env
 ```bash
-DB_HOST=localhost
+JWT_SECRET=tua_chiave_segreta
+DATABASE_URL=url_database
+PORT=0000
 DB_USER=tuo_username
-DB_PASS=tua_password
-SECRET_KEY=tua_chiave_segreta
+DB_PASSWORD=tua_password
+DB_NAME=tuo_database
+DB_HOST=localhost
+DB_DIALECT=postgres
+DB_PORT=5432
 ```
 
 ### Esecuzione
