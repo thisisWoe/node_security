@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT;
-const {logger} = require('./middleware/middleware'); // Assicurati che il percorso sia corretto
+const {logger} = require('./middleware/middleware');
 
 // configurazione sequelize
 const sequelize = require('./config/sequelize');
