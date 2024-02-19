@@ -8,6 +8,7 @@ const { loadEnvironment } = require('./config/environments-config');
 loadEnvironment();
 const port = process.env.PORT;
 
+
 // configurazione sequelize
 const sequelize = require('./config/sequelize');
 // relazioni DB
