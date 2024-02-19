@@ -1,0 +1,64 @@
+# Dipendenze
+node_modules/
+
+# File di log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directory di output di compilazione
+/dist
+/build
+
+# File di configurazione dell'ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# File di database locali
+*.sqlite
+
+# Cartella di cache del compilatore TypeScript
+.tsbuildinfo
+
+# Cartelle di cache
+.cache/
+.next
+.nuxt
+.jest
+
+# File di sistema operativo
+.DS_Store
+Thumbs.db
+
+# Directory opzionali di npm
+npm-debug.log
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.seed
+*.pid.lock
+
+# File di debug IDE e configurazioni specifiche di un editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+
+# File e cartelle di altri strumenti
+/.pnp
+.pnp.js
+*.tgz
+
+# File di configurazione di strumenti di CI
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+
+# File di copertura
+/coverage
