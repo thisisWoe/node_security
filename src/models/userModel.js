@@ -1,6 +1,5 @@
 const {Sequelize, DataTypes} = require('sequelize');
-const sequelize = require('./../config/sequelize'); // Aggiusta il percorso in base alla tua struttura
-
+const sequelize = require('./../config/sequelize');
 const User = sequelize.define('User', {
     username: {
         type: DataTypes.STRING,
