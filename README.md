@@ -1,4 +1,4 @@
-# Security System
+# Security & Auth - Node, Express
 
 Un sistema di sicurezza completo per applicazioni web, che implementa autenticazione, gestione dei ruoli, e varie misure di sicurezza per proteggere le tue applicazioni Node.js. Utilizzando Express.js come framework di base, questo progetto incorpora funzionalità avanzate come hashing delle password, limitazione delle richieste, sicurezza degli headers HTTP e gestione dei token JWT.
 
