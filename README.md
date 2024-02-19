@@ -56,7 +56,8 @@ DB_PORT=5432
 ### Esecuzione
 Per avviare l'applicazione, esegui:
 ```bash
-npm start
+cd src
+node index.js
 ```
 
 ### Contatti
