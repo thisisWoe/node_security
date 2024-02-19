@@ -3,12 +3,9 @@
 const express = require('express');
 const app = express();
 const {logger} = require('./middleware/middleware');
-const environment = process.env.NODE_ENV || 'development';
-logger.info('ENVIRONMENT: ' + environment);
-const path = require('path');
-const dotEnvPath = path.resolve(__dirname, `../.env.${environment}`);
-const dotenv = require('dotenv').config({path: dotEnvPath});
-dotenv ? logger.info('DOTENV SUCCESFULLY FOUND;') : logger.error('DOTENV NOT FOUND');
+// configurazione environment
+const { loadEnvironment } = require('./config/environments-config');
+loadEnvironment();
 const port = process.env.PORT;
 
 // configurazione sequelize
@@ -29,6 +26,11 @@ URL: http://localhost:${port}${req.url}
 HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
     next();
 });
+app.use((err, req, res, next) => {
+    logger.error(err.stack);
+    res.status(500).send('Qualcosa è andato storto!');
+});
+
 // Definizione delle rotte
 const routes = require('./api/routes/routes');
 app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
