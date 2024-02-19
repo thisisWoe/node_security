@@ -22,7 +22,6 @@ app.use((req, res, next) => {
     logger.info(`-------\nMETHOD: ${req.method}
 URL: http://localhost:${port}${req.url}
 HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
-    // Assicurati di chiamare next() per passare al prossimo middleware o gestore di rotta
     next();
 });
 // Definizione delle rotte
