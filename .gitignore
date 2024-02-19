@@ -67,3 +67,6 @@ npm-debug.log
 review.service.js
 review.controller.js
 srcCode.json
+*.development
+*.production
+*.test
