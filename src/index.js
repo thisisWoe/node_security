@@ -1,3 +1,5 @@
+// noinspection JSCheckFunctionSignatures
+
 const express = require('express');
 const app = express();
 require('dotenv').config();
@@ -10,13 +12,15 @@ require('./models/relations/db_relations');
 
 
 app.use(express.json());
-const routes = require('./api/routes/routes');
-// Utilizzo delle rotte definite
-app.use('/api', routes); // Prefisso '/api' alle rotte definite in authRoutes
-
+// impostazioni di sicurezza
+const {limiter, helmet} = require('./middleware/auth');
+app.use(helmet());
+app.use(limiter);
 // Definizione delle rotte
+const routes = require('./api/routes/routes');
+app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
 
-// app.use('/api', require('./api/routes'));
+// importo la funzione che gestisce i ruoli
 const {createInitialRoles} = require('./api/services/auth.service');
 // Connessione al database, configurazione, ecc.
 sequelize.sync().then(() => {
