@@ -3,7 +3,7 @@ const Joi = require('joi');
 
 const generateToken = (user, roles) => {
     const payload = {
-        user: user, // Includi l'ID dell'utente
+        user: user,
         roles: roles
     };
     
