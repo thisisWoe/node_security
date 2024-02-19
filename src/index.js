@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT;
+const {logger} = require('./middleware/middleware'); // Assicurati che il percorso sia corretto
 
 // configurazione sequelize
 const sequelize = require('./config/sequelize');
@@ -12,29 +13,38 @@ require('./models/relations/db_relations');
 
 
 app.use(express.json());
-// impostazioni di sicurezza
-const {limiter, helmet} = require('./middleware/auth');
+// middlewares
+const {limiter, helmet} = require('./middleware/middleware');
 app.use(helmet());
 app.use(limiter);
+app.use((req, res, next) => {
+    // Logga metodo HTTP, URL della richiesta e, opzionalmente, l'indirizzo IP del client
+    logger.info(`-------\nMETHOD: ${req.method}
+URL: http://localhost:${port}${req.url}
+HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
+    // Assicurati di chiamare next() per passare al prossimo middleware o gestore di rotta
+    next();
+});
 // Definizione delle rotte
 const routes = require('./api/routes/routes');
 app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
+
 
 // importo la funzione che gestisce i ruoli
 const {createInitialRoles} = require('./api/services/auth.service');
 // Connessione al database, configurazione, ecc.
 sequelize.sync().then(() => {
-    console.log(' ')
-    console.log('Database e modelli sincronizzati');
+    logger.info('\nDatabase e modelli sincronizzati');
     createInitialRoles().then(() => {
-        console.log('Operazioni sui ruoli completate');
+        logger.info('\nOperazioni sui ruoli completate');
         app.listen(port, () => {
-            console.log(`Applicazione in ascolto sulla porta ${port}`);
-            console.log('================================================================');
-            console.log(' ');
-            console.log(`URL: http://localhost:${port}/api`);
-            console.log(' ');
-            console.log('================================================================');
+            logger.info(`Applicazione in ascolto sulla porta ${port}
+ ================================================================
+ 
+ URL: http://localhost:${port}/api
+ 
+ ================================================================
+`);
         });
     });
 });

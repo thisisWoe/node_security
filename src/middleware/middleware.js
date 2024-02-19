@@ -57,25 +57,7 @@ const authorizeRoles = (...allowedRoles) => {
     };
 };
 
-// const authorizeRoles = (...allowedRoles) => {
-//     return (req, res, next) => {
-//         console.log('request', req.user);
-//         console.log('allowed roles', allowedRoles);
-//         console.log('user roles', req.user.roles);
-//
-//         if (!req.user || !req.user.roles) {
-//             return res.status(403).json({message: "Accesso non consentito per questo ruolo."});
-//         }
-//
-//         // Trasforma allowedRoles in minuscolo per il confronto case-insensitive
-//         const allowedRolesLower = allowedRoles.map(role => role.toLowerCase());
-//
-//         // Controlla se almeno uno dei ruoli dell'utente è incluso in allowedRoles
-//         const hasRole = req.user.roles.some(userRole =>
-//
-
-
-// Usa Helmet per impostare in modo sicuro le intestazioni HTTP.
+// Uso Helmet per impostare in modo sicuro le intestazioni HTTP.
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -85,6 +67,21 @@ const limiter = rateLimit({
     message: 'Troppe richieste da questo IP, riprova più tardi.'
 });
 
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'info', // Imposto il livello minimo di log
+    format: winston.format.combine(
+        winston.format.timestamp(), // Aggiungo un timestamp ai log
+        winston.format.json() // Formatto i log come JSON
+    ),
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.simple(), // Uso un formato semplice per i log nella console
+        }),
+        new winston.transports.File({filename: 'combined.log'}) // Salvo i log in un file
+    ]
+});
 
 module.exports = {
     generateToken,
@@ -93,5 +90,6 @@ module.exports = {
     limiter,
     helmet,
     authorizeRoles,
-    authenticateToken
+    authenticateToken,
+    logger
 };

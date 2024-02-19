@@ -3,7 +3,7 @@ const express = require('express');
 // Importa i controller che gestiscono le tue richieste
 const {registerUser, loginUser} = require('./../controllers/auth.controller');
 const {assignRole, deAssignRole} = require('./../controllers/role.controller');
-const {authenticateToken, authorizeRoles} = require('./../../middleware/auth');
+const {authenticateToken, authorizeRoles} = require('../../middleware/middleware');
 // const { getJson } = require('./../controllers/review.controller');
 
 const router = express.Router();

@@ -1,7 +1,7 @@
 // services/authService.js
 const bcrypt = require('bcrypt');
 const User = require('./../../models/userModel');
-const {generateToken, userSchemaRegistration, userSchemaLogin} = require('./../../middleware/auth');
+const {generateToken, userSchemaRegistration, userSchemaLogin} = require('../../middleware/middleware');
 const roleService = require('./role.service');
 
 const register = async (userData) => {
