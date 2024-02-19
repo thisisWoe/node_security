@@ -9,14 +9,27 @@ const config = {
         backend_port: process.env.PORT
     },
     test: {
-        // Configurazione per l'ambiente di test
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT,
+        port: process.env.DB_PORT,
+        backend_port: process.env.PORT
     },
     production: {
-        // Configurazione per l'ambiente di produzione
-        use_env_variable: 'DATABASE_URL',
-        dialect: 'postgres',
-        // Altre opzioni, come SSL, ecc...
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT,
+        port: process.env.DB_PORT,
+        backend_port: process.env.PORT
     }
 };
 
-module.exports = config;
+// Utilizzo NODE_ENV per selezionare la configurazione corretta; default a 'development' se non impostato
+const environment = process.env.NODE_ENV || 'development';
+module.exports = config[environment];
+
+// module.exports = config;

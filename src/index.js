@@ -2,9 +2,14 @@
 
 const express = require('express');
 const app = express();
-require('dotenv').config();
-const port = process.env.PORT;
 const {logger} = require('./middleware/middleware');
+const environment = process.env.NODE_ENV || 'development';
+logger.info('ENVIRONMENT: ' + environment);
+const path = require('path');
+const dotEnvPath = path.resolve(__dirname, `../.env.${environment}`);
+const dotenv = require('dotenv').config({path: dotEnvPath});
+dotenv ? logger.info('DOTENV SUCCESFULLY FOUND;') : logger.error('DOTENV NOT FOUND');
+const port = process.env.PORT;
 
 // configurazione sequelize
 const sequelize = require('./config/sequelize');
