@@ -26,10 +26,6 @@ URL: http://localhost:${port}${req.url}
 HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
     next();
 });
-app.use((err, req, res, next) => {
-    logger.error(err.stack);
-    res.status(500).send('Qualcosa è andato storto!');
-});
 
 // Definizione delle rotte
 const routes = require('./api/routes/routes');
