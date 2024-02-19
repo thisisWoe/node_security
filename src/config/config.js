@@ -1,5 +1,3 @@
-// require('dotenv').config(); // Assicurati di avere dotenv configurato se usi variabili d'ambiente
-
 const config = {
     development: {
         username: process.env.DB_USER,
@@ -18,8 +16,7 @@ const config = {
         use_env_variable: 'DATABASE_URL',
         dialect: 'postgres',
         // Altre opzioni, come SSL, ecc...
-    }};
-
-// console.log('config',config);
+    }
+};
 
 module.exports = config;

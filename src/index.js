@@ -11,7 +11,7 @@ const sequelize = require('./config/sequelize');
 // relazioni DB
 require('./models/relations/db_relations');
 
-
+// Questo middleware incorporato in Express analizza le richieste in entrata con payload JSON, rendendo accessibile il corpo della richiesta tramite req.body
 app.use(express.json());
 // middlewares
 const {limiter, helmet} = require('./middleware/middleware');
@@ -28,7 +28,6 @@ HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
 // Definizione delle rotte
 const routes = require('./api/routes/routes');
 app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
-
 
 // importo la funzione che gestisce i ruoli
 const {createInitialRoles} = require('./api/services/auth.service');

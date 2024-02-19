@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
-const User = require('./../models/userModel');
 
 const generateToken = (user, roles) => {
     const payload = {
@@ -22,7 +21,7 @@ const userSchemaLogin = Joi.object({
     password: Joi.string().min(6).required(),
 });
 
-// Middleware per proteggere le route
+// Middleware per proteggere le routes
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -59,6 +58,7 @@ const authorizeRoles = (...allowedRoles) => {
 
 // Uso Helmet per impostare in modo sicuro le intestazioni HTTP.
 const helmet = require('helmet');
+// uso express-rate-limit per controllare il numero massimo di chiamate da uno stesso IP
 const rateLimit = require('express-rate-limit');
 
 const limiter = rateLimit({
@@ -67,6 +67,7 @@ const limiter = rateLimit({
     message: 'Troppe richieste da questo IP, riprova più tardi.'
 });
 
+// uso winston per i log
 const winston = require('winston');
 
 const logger = winston.createLogger({

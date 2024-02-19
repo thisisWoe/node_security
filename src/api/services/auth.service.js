@@ -6,31 +6,26 @@ const roleService = require('./role.service');
 
 const register = async (userData) => {
     const {username, email, password} = userData;
-    
     // Validazione dell'input
     const {error} = userSchemaRegistration.validate(userData);
     if (error) {
         throw new Error(error.details[0].message);
     }
-    
     const userExists = await User.findOne({where: {email}});
     if (userExists) {
         throw new Error('L\'email è già in uso.');
     }
-    
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
         username,
         email,
         password: hashedPassword,
     });
-    
     // Trova il ruolo di default (es. 'user')
     const defaultRole = await Role.findOne({where: {name: 'USER'}});
     if (!defaultRole) {
         throw new Error('Ruolo di default non trovato.');
     }
-    ;
     await user.addRole(defaultRole);
     
     return {
@@ -60,7 +55,7 @@ const login = async (loginData) => {
     };
 };
 
-const Role = require('./../../models/roleModel'); // Aggiorna il percorso in base alla tua struttura
+const Role = require('./../../models/roleModel');
 const initialRoles = ['ADMIN', 'MODERATOR', 'USER'];
 const createInitialRoles = async () => {
     await Promise.all(initialRoles.map(async (roleName) => {
