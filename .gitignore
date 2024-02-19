@@ -62,3 +62,8 @@ npm-debug.log
 
 # File di copertura
 /coverage
+
+# File di export codice
+review.service.js
+review.controller.js
+srcCode.json
