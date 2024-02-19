@@ -46,8 +46,9 @@ SECRET_KEY=tua_chiave_segreta
 
 ### Esecuzione
 Per avviare l'applicazione, esegui:
-
+```bash
 npm start
+```
 
 ### Contatti
 Per qualsiasi domanda o suggerimento, sentiti libero di contattarmi all'indirizzo a.rondolini.dev@gmail.com
