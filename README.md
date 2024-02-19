@@ -33,7 +33,9 @@ Prima di installare il progetto, assicurati di avere **Node.js** e **PostgreSQL*
 ### Clona il Repository
 
 ### Installazione delle dipendenze
+```bash
 npm install
+```
 
 
 ### Configurazione del file .env
