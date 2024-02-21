@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const {logger} = require('./middleware/middleware');
 // configurazione environment
-const { loadEnvironment } = require('./config/environments-config');
+const {loadEnvironment} = require('./config/environments-config');
 loadEnvironment();
 const port = process.env.PORT;
 

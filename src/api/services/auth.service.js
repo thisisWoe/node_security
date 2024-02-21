@@ -1,10 +1,12 @@
 // services/authService.js
 const bcrypt = require('bcrypt');
 const User = require('./../../models/userModel');
+const ResetToken = require('./../../models/resetTokenModel');
 const {generateToken, userSchemaRegistration, userSchemaLogin} = require('../../middleware/middleware');
 const roleService = require('./role.service');
 
 const register = async (userData) => {
+    if (userData.confirmed) throw new Error('Il campo di conferma non può essere impostato.');
     const {username, email, password} = userData;
     // Validazione dell'input
     const {error} = userSchemaRegistration.validate(userData);
@@ -67,4 +69,103 @@ const createInitialRoles = async () => {
     }));
 };
 
-module.exports = {register, login, createInitialRoles};
+const config = require('./../../config/config');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
+const sendPasswordResetEmail = async (emailObj) => {
+    const {email} = emailObj;
+    const user = await User.findOne({where: {email}});
+    if (!user) throw new Error('Nessun utente trovato con questa email.');
+    
+    try {
+        // Crea il transporter di Nodemailer usando le credenziali SMTP di SendinBlue
+        let transporter = nodemailer.createTransport({
+            host: config.sendin_blue_host,
+            port: config.sendin_blue_port,
+            secure: false, // true per 465, false per altre porte
+            auth: {
+                user: config.sendin_blue_email, // sostituisci con il tuo indirizzo email SendinBlue
+                pass: config.sendin_blue_key // sostituisci con la tua password SMTP di SendinBlue
+            },
+            logger: true, // Attiva il logging
+            debug: true,
+        });
+        
+        const jwtToken = jwt.sign(
+            {
+                userId: user.id,
+                purpose: "password-reset"
+            },
+            process.env.JWT_SECRET,
+            {expiresIn: process.env.TEMPORARY_TOKEN} // Il token scade dopo 1 ora
+        );
+        
+        const resetToken = await ResetToken.create({
+            userId: user.id,
+            token: jwtToken,
+            expiryDate: jwt.decode(jwtToken).exp,
+        });
+        
+        const resetUrl = `${process.env.RESET_PASSWORD_URL}/${resetToken.token}`;
+        
+        // Configura l'email da inviare
+        let mailOptions = {
+            from: `${process.env.TITLE_MAIL} <${process.env.SENDIN_BLUE_EMAIL}>`, // mittente
+            to: email, // lista dei destinatari
+            subject: `${process.env.SUBJECT_MAIL}`, // Oggetto
+            html: `
+<div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+    <h1>Clicca sul bottone qui sotto per resettare la tua password!</h1>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; height: 200px;">
+    <a href=\"${resetUrl}\">
+        <button style="border-radius: 1rem; background-color: blue; color: white; height: 50px" >
+            Resetta Password
+        </button>
+    </a>
+</div>
+` // corpo dell'email in formato HTML
+        };
+        
+        // Invia l'email
+        await transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                throw new Error(error.message);
+            }
+        });
+        
+        return 'Email per il reset della password inviata.';
+    } catch (e) {
+        throw new Error(e.message);
+    }
+};
+
+const changePassword = async (data) => {
+    const {tokenJwt, newPassword} = data;
+    const {userId, purpose} = jwt.decode(tokenJwt);
+    
+    if (!tokenJwt) throw new Error('Token JWT non valido.');
+    if (!purpose) throw new Error('Token JWT non valido.');
+    if (!userId) throw new Error('Utente non trovato.');
+    if (!newPassword) throw new Error('Nessuna password inviata.');
+    
+    if (purpose !== "password-reset") throw new Error('Token non abilitato per questa operazione.');
+    
+    jwt.verify(tokenJwt, process.env.JWT_SECRET, (err) => {
+        if (err) {
+            throw new Error('Token non abilitato per questa operazione.');
+        }
+    });
+    
+    const user = await User.findByPk(userId);
+    if (!user) throw new Error('Nessun utente trovato.');
+    
+    user.password = await bcrypt.hash(newPassword, 10);
+    
+    await user.save();
+    
+    return user;
+};
+
+module.exports = {register, login, createInitialRoles, sendPasswordResetEmail, changePassword};

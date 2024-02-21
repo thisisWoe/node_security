@@ -6,7 +6,11 @@ const config = {
         host: process.env.DB_HOST,
         dialect: process.env.DB_DIALECT,
         port: process.env.DB_PORT,
-        backend_port: process.env.PORT
+        backend_port: process.env.PORT,
+        sendin_blue_email: process.env.SENDIN_BLUE_EMAIL,
+        sendin_blue_key: process.env.SENDIN_BLUE_KEY,
+        sendin_blue_host: process.env.SENDIN_BLUE_HOST,
+        sendin_blue_port: process.env.SENDIN_BLUE_PORT
     },
     test: {
         username: process.env.DB_USER,
