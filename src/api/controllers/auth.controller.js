@@ -38,7 +38,6 @@ const sendEmailResetPsw = async (req, res) => {
 
 const changePassword = async (req, res) => {
     const data = req.body;
-    console.log(data);
     try {
         const result = await authService.changePassword(data);
         res.status(200).json({
@@ -46,10 +45,22 @@ const changePassword = async (req, res) => {
             data: result
         })
     } catch (error) {
-        console.error(error)
         return res.status(500).send({message: "Errore durante il cambio della password.\n" + error.message});
     }
 };
 
+const confirmRegistration = async (req, res) => {
+    const token = req.body;
+    try {
+        const result = await authService.confirmRegistration(token);
+        res.status(200).json({
+            message: 'Registrazione utente confermata.',
+            data: result
+        })
+    } catch (error) {
+        return res.status(500).send({message: "Errore durante la conferma della registrazione.\n" + error.message});
+    }
+};
 
-module.exports = {registerUser, loginUser, sendEmailResetPsw, changePassword};
+
+module.exports = {registerUser, loginUser, sendEmailResetPsw, changePassword, confirmRegistration};

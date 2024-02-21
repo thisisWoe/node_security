@@ -29,6 +29,36 @@ const register = async (userData) => {
         throw new Error('Ruolo di default non trovato.');
     }
     await user.addRole(defaultRole);
+    try {
+        let transporter = createTransporter();
+        const jwtToken = createJwtForActions(user, "confirm-registration");
+        const resetUrl = `${process.env.CONFIRM_REGISTRATION_URL}/${jwtToken}`;
+        let mailOptions = {
+            from: `${process.env.TITLE_MAIL} <${process.env.SENDIN_BLUE_EMAIL}>`, // mittente
+            to: email, // lista dei destinatari
+            subject: `${process.env.SUBJECT_MAIL}`, // Oggetto
+            html: `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                        <h1>Clicca sul bottone qui sotto per confermare la tua registrazione!</h1>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; height: 200px;">
+                        <a href=\"${resetUrl}\">
+                            <button style="border-radius: 1rem; background-color: blue; color: white; height: 50px" >
+                                Conferma Registrazione
+                            </button>
+                        </a>
+                    </div>
+                  `
+        };
+        // Invia l'email
+        await transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                throw new Error(error.message);
+            }
+        });
+    } catch (e) {
+        throw new Error(e.message);
+    }
     
     return {
         user: {id: user.id, username: user.username, email: user.email}
@@ -57,6 +87,31 @@ const login = async (loginData) => {
     };
 };
 
+const confirmRegistration = async (token) => {
+    const {tokenJwt} = token;
+    const {userId, purpose} = jwt.decode(tokenJwt);
+    
+    if (!tokenJwt) throw new Error('Token JWT non valido.');
+    if (!purpose) throw new Error('Token JWT non valido.');
+    if (!userId) throw new Error('Utente non trovato.');
+    if (purpose !== "confirm-registration") throw new Error('Token non abilitato per questa operazione.');
+    
+    jwt.verify(tokenJwt, process.env.JWT_SECRET, (err) => {
+        if (err) {
+            throw new Error('Token non abilitato per questa operazione.');
+        }
+    });
+    
+    const user = await User.findByPk(userId);
+    if (!user) throw new Error('Nessun utente trovato.');
+    
+    user.confirmed = true;
+    
+    await user.save();
+    
+    return user;
+};
+
 const Role = require('./../../models/roleModel');
 const initialRoles = ['ADMIN', 'MODERATOR', 'USER'];
 const createInitialRoles = async () => {
@@ -73,6 +128,30 @@ const config = require('./../../config/config');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        host: config.sendin_blue_host,
+        port: config.sendin_blue_port,
+        secure: false, // true per 465, false per altre porte
+        auth: {
+            user: config.sendin_blue_email, // sostituisci con il tuo indirizzo email SendinBlue
+            pass: config.sendin_blue_key // sostituisci con la tua password SMTP di SendinBlue
+        },
+        logger: true, // Attiva il logging
+        debug: true,
+    });
+};
+
+const createJwtForActions = (user, actions) => {
+    return jwt.sign(
+        {
+            userId: user.id,
+            purpose: actions
+        },
+        process.env.JWT_SECRET,
+        {expiresIn: process.env.TEMPORARY_TOKEN} // Il token scade dopo 1 ora
+    );
+};
 const sendPasswordResetEmail = async (emailObj) => {
     const {email} = emailObj;
     const user = await User.findOne({where: {email}});
@@ -80,34 +159,11 @@ const sendPasswordResetEmail = async (emailObj) => {
     
     try {
         // Crea il transporter di Nodemailer usando le credenziali SMTP di SendinBlue
-        let transporter = nodemailer.createTransport({
-            host: config.sendin_blue_host,
-            port: config.sendin_blue_port,
-            secure: false, // true per 465, false per altre porte
-            auth: {
-                user: config.sendin_blue_email, // sostituisci con il tuo indirizzo email SendinBlue
-                pass: config.sendin_blue_key // sostituisci con la tua password SMTP di SendinBlue
-            },
-            logger: true, // Attiva il logging
-            debug: true,
-        });
+        let transporter = createTransporter();
         
-        const jwtToken = jwt.sign(
-            {
-                userId: user.id,
-                purpose: "password-reset"
-            },
-            process.env.JWT_SECRET,
-            {expiresIn: process.env.TEMPORARY_TOKEN} // Il token scade dopo 1 ora
-        );
+        const jwtToken = createJwtForActions(user, "password-reset");
         
-        const resetToken = await ResetToken.create({
-            userId: user.id,
-            token: jwtToken,
-            expiryDate: jwt.decode(jwtToken).exp,
-        });
-        
-        const resetUrl = `${process.env.RESET_PASSWORD_URL}/${resetToken.token}`;
+        const resetUrl = `${process.env.RESET_PASSWORD_URL}/${jwtToken}`;
         
         // Configura l'email da inviare
         let mailOptions = {
@@ -168,4 +224,4 @@ const changePassword = async (data) => {
     return user;
 };
 
-module.exports = {register, login, createInitialRoles, sendPasswordResetEmail, changePassword};
+module.exports = {register, login, createInitialRoles, sendPasswordResetEmail, changePassword, confirmRegistration};
