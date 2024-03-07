@@ -268,10 +268,10 @@ const getUserInfo = async (accessToken) => {
 };
 
 const registerWithGoogle = async (googleData) => {
-    
+    console.log('dati google', googleData);
     if (!googleData) throw new Error('Si è verificato un errore durante l\'autenticazione.');
-    const {name, email, id} = googleData;
-    const googleObj = {username: name, email: email, id: id};
+    const {name, email} = googleData;
+    const googleObj = {username: name, email: email};
     // Validazione dell'input
     const {error} = userSchemaRegistrationGoogle.validate(googleObj);
     if (error) {
@@ -279,13 +279,18 @@ const registerWithGoogle = async (googleData) => {
     }
     const userExists = await User.findOne({where: {email}});
     if (userExists) {
-        throw new Error('L\'email è già in uso.');
+        if (userExists.auth_type !== 'node') {
+            return {user: userExists};
+        } else {
+            throw new Error('Utente registrato tramite credenziali.');
+        }
     }
-
+    
     const user = await User.create({
-        username:name,
-        email:email,
-        id:id,
+        username: name.toLowerCase().replace(/ /g, '_'),
+        email: email,
+        confirmed: true,
+        auth_type: 'google',
     });
     // Trova il ruolo di default (es. 'user')
     const defaultRole = await Role.findOne({where: {name: 'USER'}});
@@ -297,8 +302,23 @@ const registerWithGoogle = async (googleData) => {
     return {
         user: {id: user.id, username: user.username, email: user.email}
     };
-    
 };
+
+const loginWithGoogle = async (username) => {
+    
+    const user = await User.findOne({where: {username}});
+    if (!user) {
+        throw new Error('Errore nell\'autenticazione con Google.');
+    }
+    
+    const roles = await roleService.findUserRoles(user.id);
+    const userJwt = {id: user.id, username: user.username, email: user.email};
+    
+    return {
+        token: generateToken(userJwt, roles),
+    };
+};
+
 
 module.exports = {
     register,
@@ -308,5 +328,7 @@ module.exports = {
     changePassword,
     confirmRegistration,
     getToken,
-    getUserInfo
+    getUserInfo,
+    registerWithGoogle,
+    loginWithGoogle
 };

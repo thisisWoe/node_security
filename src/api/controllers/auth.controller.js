@@ -62,5 +62,27 @@ const confirmRegistration = async (req, res) => {
     }
 };
 
+const registerUserWithGoogle = async (req, res) => {
+    const code = req.query.code;
+    try {
+        const token = await authService.getToken(code);
+        const userInfo = await authService.getUserInfo(token.access_token);
+        const resRegistrationUserGoogle = await authService.registerWithGoogle(userInfo);
+        const jwtToken = await authService.loginWithGoogle(resRegistrationUserGoogle.user.username);
+        
+        res.status(200).json(jwtToken);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+};
 
-module.exports = {registerUser, loginUser, sendEmailResetPsw, changePassword, confirmRegistration};
+
+
+module.exports = {
+    registerUser,
+    loginUser,
+    sendEmailResetPsw,
+    changePassword,
+    confirmRegistration,
+    registerUserWithGoogle,
+};

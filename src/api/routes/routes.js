@@ -6,12 +6,12 @@ const {
     loginUser,
     sendEmailResetPsw,
     changePassword,
-    confirmRegistration
+    confirmRegistration,
+    registerUserWithGoogle,
 } = require('./../controllers/auth.controller');
 const {assignRole, deAssignRole} = require('./../controllers/role.controller');
 const {authenticateToken, authorizeRoles} = require('../../middleware/middleware');
 // const { getJson } = require('./../controllers/review.controller');
-const {getToken, getUserInfo} = require('./../services/auth.service');
 
 const router = express.Router();
 const passport = require('passport');
@@ -27,23 +27,10 @@ router.post('/confirm-registration', confirmRegistration);
 // router.get('/export-src-code', getJson);
 // Route per iniziare l'autenticazione
 router.get('/register/google', passport.authenticate('google', {scope: ['profile', 'email']}));
-
 // Route di callback dopo l'autenticazione
-router.get('/register/google/callback', passport.authenticate('google', {failureRedirect: '/login'}),
-    function (req, res) {
-        // Autenticazione riuscita, reindirizza alla home.
-        res.redirect('/oauth');
-    }
-);
-router.get('/oauth', async (req, res) => {
-    const code = req.query.code;
-    console.log('code', code);
-    const token = await getToken(code);
-    console.log(token);
-    const userInfo = await getUserInfo(token.access_token);
-    console.log(userInfo);
-    res.send('<h1>Route di arrivo dopo autenticazione Google</h1>');
-});
+router.get('/register/google/callback', passport.authenticate('google', {failureRedirect: '/login'}), (req, res) => res.redirect('/oauth'));
+router.get('/oauth', registerUserWithGoogle);
+
 
 module.exports = router;
 
