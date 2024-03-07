@@ -13,13 +13,18 @@ const User = sequelize.define('User', {
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     confirmed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
     },
+    auth_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'node'
+    }
 }, {
     tableName: 'users'
 });

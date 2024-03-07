@@ -7,6 +7,8 @@ const {logger} = require('./middleware/middleware');
 const {loadEnvironment} = require('./config/environments-config');
 loadEnvironment();
 const port = process.env.PORT;
+// configurazione passport per login con Google
+require('./config/passport-setup');
 
 // configurazione sequelize
 const sequelize = require('./config/sequelize');
@@ -34,7 +36,7 @@ app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
 // importo la funzione che gestisce i ruoli
 const {createInitialRoles} = require('./api/services/auth.service');
 // Connessione al database, configurazione, ecc.
-sequelize.sync().then(() => {
+sequelize.sync({ alter: true }).then(() => {
     logger.info('\nDatabase e modelli sincronizzati');
     createInitialRoles().then(() => {
         logger.info('\nOperazioni sui ruoli completate');

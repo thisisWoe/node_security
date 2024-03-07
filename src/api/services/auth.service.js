@@ -2,7 +2,12 @@
 const bcrypt = require('bcrypt');
 const User = require('./../../models/userModel');
 const ResetToken = require('./../../models/resetTokenModel');
-const {generateToken, userSchemaRegistration, userSchemaLogin} = require('../../middleware/middleware');
+const {
+    generateToken,
+    userSchemaRegistration,
+    userSchemaLogin,
+    userSchemaRegistrationGoogle
+} = require('../../middleware/middleware');
 const roleService = require('./role.service');
 
 const register = async (userData) => {
@@ -224,4 +229,84 @@ const changePassword = async (data) => {
     return user;
 };
 
-module.exports = {register, login, createInitialRoles, sendPasswordResetEmail, changePassword, confirmRegistration};
+const axios = require('axios');
+const qs = require('node:querystring');
+
+const getToken = async (code) => {
+    const url = 'https://oauth2.googleapis.com/token';
+    const values = {
+        code: code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.REDIRECT_URI_GOOGLE,
+        grant_type: 'authorization_code'
+    };
+    
+    try {
+        const response = await axios.post(url, qs.stringify(values), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        return response.data; // Questo oggetto contiene il token di accesso e il token di refresh
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+const getUserInfo = async (accessToken) => {
+    try {
+        const response = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        return response.data; // Questo oggetto contiene informazioni sull'utente
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+const registerWithGoogle = async (googleData) => {
+    
+    if (!googleData) throw new Error('Si è verificato un errore durante l\'autenticazione.');
+    const {name, email, id} = googleData;
+    const googleObj = {username: name, email: email, id: id};
+    // Validazione dell'input
+    const {error} = userSchemaRegistrationGoogle.validate(googleObj);
+    if (error) {
+        throw new Error(error.details[0].message);
+    }
+    const userExists = await User.findOne({where: {email}});
+    if (userExists) {
+        throw new Error('L\'email è già in uso.');
+    }
+
+    const user = await User.create({
+        username:name,
+        email:email,
+        id:id,
+    });
+    // Trova il ruolo di default (es. 'user')
+    const defaultRole = await Role.findOne({where: {name: 'USER'}});
+    if (!defaultRole) {
+        throw new Error('Ruolo di default non trovato.');
+    }
+    await user.addRole(defaultRole);
+    
+    return {
+        user: {id: user.id, username: user.username, email: user.email}
+    };
+    
+};
+
+module.exports = {
+    register,
+    login,
+    createInitialRoles,
+    sendPasswordResetEmail,
+    changePassword,
+    confirmRegistration,
+    getToken,
+    getUserInfo
+};
