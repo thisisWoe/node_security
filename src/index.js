@@ -3,10 +3,22 @@
 const express = require('express');
 const app = express();
 const {logger} = require('./middleware/middleware');
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 // configurazione environment
 const {loadEnvironment} = require('./config/environments-config');
 loadEnvironment();
 const port = process.env.PORT;
+
+// Applica il middleware CORS a tutte le richieste
+const cors = require("cors");
+const corsOptions = {
+    origin: ['http://localhost:4200'],
+    credentials: true, // Permette al server di accettare i cookie inviati dal client
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
 // configurazione passport per login con Google
 require('./config/passport-setup');
 

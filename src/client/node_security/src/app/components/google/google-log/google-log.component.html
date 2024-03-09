@@ -1,0 +1,16 @@
+<div class="col-12 d-flex justify-content-center mt-3">
+  <div class="alert alert-danger col-8 my-3" role="alert"
+       *ngIf="this.errorLog">
+    {{ this.errorText }}
+    <br>Sarai reindirizzato alla pagina principale in <span class="num-confirm fs-5 fw-bold">5</span> secondi.
+  </div>
+</div>
+
+<div class="col-12 d-flex justify-content-center mt-3">
+  <div class="alert alert-success col-8 mb-3" role="alert"
+       *ngIf="this.logged">
+    Ti sei loggato correttamente!
+    <br>Sarai reindirizzato alla pagina principale in <span class="num-confirm fs-5 fw-bold">5</span> secondi.
+  </div>
+</div>
+

@@ -8,6 +8,7 @@ const {
     changePassword,
     confirmRegistration,
     registerUserWithGoogle,
+    retrieveTokenAfterGoogleAuth
 } = require('./../controllers/auth.controller');
 const {assignRole, deAssignRole} = require('./../controllers/role.controller');
 const {authenticateToken, authorizeRoles} = require('../../middleware/middleware');
@@ -27,12 +28,13 @@ router.post('/confirm-registration', confirmRegistration);
 // router.get('/export-src-code', getJson);
 // Route per iniziare l'autenticazione
 router.get('/register/google', passport.authenticate('google', {scope: ['profile', 'email']}));
+
 // Route di callback dopo l'autenticazione
 router.get('/register/google/callback', passport.authenticate('google', {failureRedirect: '/login'}), (req, res) => res.redirect('/oauth'));
+
 router.get('/oauth', registerUserWithGoogle);
+
+router.get('/userinfo', retrieveTokenAfterGoogleAuth);
 
 
 module.exports = router;
-
-
-// http://localhost:3000/api/oauth?code=4%2F0AeaYSHBOImBYTYoADgqcfiqI3RM_EQvGsO22dvVXfnfsBGLzPJZXUixiORt1H0F4_f4vwA&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=consent

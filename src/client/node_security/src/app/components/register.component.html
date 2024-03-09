@@ -1,0 +1,93 @@
+<div class="container-fluid home-wrapper">
+  <form [formGroup]="this.form" (submit)="this.onSubmit()" class="row">
+    <button type="button" class="btn btn-outline-primary col-2 ms-4 my-3 btn-back" [routerLink]="['./../auth']">
+      <svg fill="#007bff" width="30px" height="30px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier"><title></title>
+          <path
+            d="M39.3756,48.0022l30.47-25.39a6.0035,6.0035,0,0,0-7.6878-9.223L26.1563,43.3906a6.0092,6.0092,0,0,0,0,9.2231L62.1578,82.615a6.0035,6.0035,0,0,0,7.6878-9.2231Z"></path>
+        </g>
+      </svg>
+    </button>
+
+    <div class="col-12 d-flex justify-content-center">
+      <div class="form-floating mb-3 col-8">
+        <input type="email" class="form-control" id="email-float" formControlName="email"
+               placeholder="name@example.com">
+        <label for="email-float" class="ms-2">Email</label>
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="form-floating mb-3 col-8">
+        <input type="text" class="form-control" formControlName="username" id="username-float"
+               placeholder="name@example.com">
+        <label for="username-float" class="ms-2">Username</label>
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="form-floating mb-3 col-8">
+        <input [type]="showPassword ? 'text' : 'password'"
+               class="form-control" formControlName="password" id="password-float"
+               placeholder="name@example.com">
+        <button type="button" class="btn btn-outline-primary position-absolute end-0 top-0"
+                (click)="toggleShowPassword()" style="height: 100%; border-radius: 0 0.25rem 0.25rem 0;">
+          <svg fill="#007bff" width="20px" height="20px" viewBox="0 0 32 32" version="1.1"
+               xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"><title>eye</title>
+              <path
+                d="M0 16q0.064 0.128 0.16 0.352t0.48 0.928 0.832 1.344 1.248 1.536 1.664 1.696 2.144 1.568 2.624 1.344 3.136 0.896 3.712 0.352 3.712-0.352 3.168-0.928 2.592-1.312 2.144-1.6 1.664-1.632 1.248-1.6 0.832-1.312 0.48-0.928l0.16-0.352q-0.032-0.128-0.16-0.352t-0.48-0.896-0.832-1.344-1.248-1.568-1.664-1.664-2.144-1.568-2.624-1.344-3.136-0.896-3.712-0.352-3.712 0.352-3.168 0.896-2.592 1.344-2.144 1.568-1.664 1.664-1.248 1.568-0.832 1.344-0.48 0.928zM10.016 16q0-2.464 1.728-4.224t4.256-1.76 4.256 1.76 1.76 4.224-1.76 4.256-4.256 1.76-4.256-1.76-1.728-4.256zM12 16q0 1.664 1.184 2.848t2.816 1.152 2.816-1.152 1.184-2.848-1.184-2.816-2.816-1.184-2.816 1.184l2.816 2.816h-4z"></path>
+            </g>
+          </svg>
+        </button>
+        <label for="password-float" class="ms-2">Password</label>
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="form-floating mb-3 col-8">
+        <input type="password"
+               class="form-control" formControlName="confirmPassword" id="password-conf-float"
+               placeholder="name@example.com">
+        <label for="password-conf-float" class="ms-2">Conferma Password</label>
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.emailInvalid && this.form.get('email')?.invalid">
+        Email non valida.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.usernameInvalid && this.form.get('username')?.invalid">
+        Lo username deve avere: minimo 4 caratteri, massimo 20 caratteri e non contenere spazi.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.passwordInvalid && this.form.get('password')?.invalid">
+        Lo username deve avere almeno: 8 caratteri, 1 minuscola, 1 maiuscola, 1 numero e 1 carattere speciale.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.confPasswordInvalid && this.form.get('confirmPassword')?.invalid">
+        Le due password non coincidono.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-success col-8 mb-3" role="alert"
+           *ngIf="this.registered">
+        Ti sei registrato correttamente! Ti abbiamo inviato una mail con un link per confermare la tua registrazione.
+        <br>Sarai reindirizzato alla pagina principale in <span class="num-confirm fs-5 fw-bold">5</span> secondi.
+      </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-center mb-3">
+      <button class="btn btn-success" type="submit" [disabled]="this.form.disabled" >Conferma</button>
+    </div>
+
+  </form>
+</div>

@@ -67,15 +67,43 @@ const registerUserWithGoogle = async (req, res) => {
     try {
         const token = await authService.getToken(code);
         const userInfo = await authService.getUserInfo(token.access_token);
-        const resRegistrationUserGoogle = await authService.registerWithGoogle(userInfo);
-        const jwtToken = await authService.loginWithGoogle(resRegistrationUserGoogle.user.username);
+        try {
+            const resRegistrationUserGoogle = await authService.registerWithGoogle(userInfo);
+            const jwtToken = await authService.loginWithGoogle(resRegistrationUserGoogle.user.username);
+            
+            res.cookie('authToken', jwtToken, {httpOnly: true, secure: true, sameSite: 'None'});
+            res.redirect('http://localhost:4200/googleLog');
+        } catch (e) {
+            res.cookie('error', 'Utente registrato tramite credenziali.', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None'
+            });
+            res.redirect('http://localhost:4200/googleLog');
+        }
         
-        res.status(200).json(jwtToken);
     } catch (error) {
         res.status(500).json({error: error.message});
     }
 };
 
+const retrieveTokenAfterGoogleAuth = async (req, res) => {
+    try {
+        const token = req.cookies.authToken;
+        if (!token) {
+            throw new Error('Nessun token trovato.');
+        }
+        res.cookie('authToken', '', {httpOnly: true, secure: true, sameSite: 'None'})
+        // Restituisco il token come risposta
+        res.json(token);
+    } catch (e) {
+        // res.status(401).json({error: 'Non autorizzato', message: e.message});
+        const errorInfo = {error: req.cookies.error};
+        res.cookie('error', errorInfo, {httpOnly: true, secure: true, sameSite: 'None'})
+        // Restituisco il token come risposta
+        res.json(errorInfo);
+    }
+};
 
 
 module.exports = {
@@ -85,4 +113,5 @@ module.exports = {
     changePassword,
     confirmRegistration,
     registerUserWithGoogle,
+    retrieveTokenAfterGoogleAuth,
 };
