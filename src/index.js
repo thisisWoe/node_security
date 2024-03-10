@@ -1,54 +1,51 @@
 // noinspection JSCheckFunctionSignatures
 
-const express = require('express');
-const app = express();
-const {logger} = require('./middleware/middleware');
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
 // configurazione environment
 const {loadEnvironment} = require('./config/environments-config');
 loadEnvironment();
 const port = process.env.PORT;
 
-// Applica il middleware CORS a tutte le richieste
+const express = require('express');
+const app = express();
+const path = require('path');
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
-const corsOptions = {
-    origin: ['http://localhost:4200'],
-    credentials: true, // Permette al server di accettare i cookie inviati dal client
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
 
-// configurazione passport per login con Google
-require('./config/passport-setup');
-
-// configurazione sequelize
+// configurazione sequelize e relazioni DB
 const sequelize = require('./config/sequelize');
-// relazioni DB
-require('./models/relations/db_relations');
-
-// Questo middleware incorporato in Express analizza le richieste in entrata con payload JSON, rendendo accessibile il corpo della richiesta tramite req.body
-app.use(express.json());
+const relations = require('./models/relations/db_relations');
+// configurazione passport per login con Google
+const passportSetup = require('./config/passport-setup');
 // middlewares
-const {limiter, helmet} = require('./middleware/middleware');
+const {limiter, helmet, corsOptions, logger} = require('./middleware/middleware');
+// Definizione delle rotte
+const routes = require('./api/routes/routes');
+// user roles
+const {createInitialRoles} = require('./api/services/auth.service');
+
+// middlewares
+app.use(cookieParser());
 app.use(helmet());
 app.use(limiter);
+app.use(cors(corsOptions));
+app.use(express.json());
+// Logga metodo HTTP, URL della richiesta e, opzionalmente, l'indirizzo IP del client
 app.use((req, res, next) => {
-    // Logga metodo HTTP, URL della richiesta e, opzionalmente, l'indirizzo IP del client
-    logger.info(`-------\nMETHOD: ${req.method}
-URL: http://localhost:${port}${req.url}
-HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
+    logger.info(
+        `
+    METHOD: ${req.method}
+    URL: ${process.env.HOST}${req.url}
+    HEADERS: ${JSON.stringify(req.headers)}`, {ip: req.ip});
     next();
 });
 
-// Definizione delle rotte
-const routes = require('./api/routes/routes');
-app.use('/api', routes); // Prefisso '/api' alle rotte definite in routes
+// Prefisso '/api' alle rotte definite in routes
+app.use('/api', routes);
+// Serve i file statici dalla cartella di build di Angular
+app.use('/api/app-angular/', express.static(path.join(__dirname, '/client/node_security/dist/node_security/browser')));
 
-// importo la funzione che gestisce i ruoli
-const {createInitialRoles} = require('./api/services/auth.service');
 // Connessione al database, configurazione, ecc.
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync({alter: true}).then(() => {
     logger.info('\nDatabase e modelli sincronizzati');
     createInitialRoles().then(() => {
         logger.info('\nOperazioni sui ruoli completate');
@@ -56,7 +53,8 @@ sequelize.sync({ alter: true }).then(() => {
             logger.info(`Applicazione in ascolto sulla porta ${port}
  ================================================================
  
- URL: http://localhost:${port}/api
+ URL: ${process.env.HOST}/api\n
+ CLIENT: http://localhost:${port}/api/app-angular
  
  ================================================================
 `);

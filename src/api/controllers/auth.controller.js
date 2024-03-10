@@ -71,14 +71,16 @@ const registerUserWithGoogle = async (req, res) => {
             const resRegistrationUserGoogle = await authService.registerWithGoogle(userInfo);
             const jwtToken = await authService.loginWithGoogle(resRegistrationUserGoogle.user.username);
             res.cookie('authToken', jwtToken, {httpOnly: true, secure: true, sameSite: 'None'});
-            res.redirect('http://localhost:4200/googleLog');
+            process.env.HOST
+            res.redirect(process.env.HOST + '/api/app-angular/googleLog');
         } catch (e) {
             res.cookie('error', 'Utente registrato tramite credenziali.', {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'None'
             });
-            res.redirect('http://localhost:4200/googleLog');
+            res.redirect(process.env.HOST + '/api/app-angular/googleLog');
+            
         }
         
     } catch (error) {

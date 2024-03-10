@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 
+
 const generateToken = (user, roles) => {
     const payload = {
         user: user,
@@ -88,6 +89,13 @@ const logger = winston.createLogger({
     ]
 });
 
+// Applica il middleware CORS a tutte le richieste
+const corsOptions = {
+    origin: [process.env.HOST,],
+    credentials: true, // Permette al server di accettare i cookie inviati dal client (GoogleAuth)
+    optionsSuccessStatus: 200
+};
+
 module.exports = {
     generateToken,
     userSchemaRegistration,
@@ -97,5 +105,6 @@ module.exports = {
     authorizeRoles,
     authenticateToken,
     logger,
-    userSchemaRegistrationGoogle
+    userSchemaRegistrationGoogle,
+    corsOptions
 };

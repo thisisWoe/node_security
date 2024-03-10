@@ -37,4 +37,23 @@ router.get('/oauth', registerUserWithGoogle);
 router.get('/userinfo', retrieveTokenAfterGoogleAuth);
 
 
+// endpoint per webapp ANGULAR
+const path = require('path');
+router.get('/app-angular/auth', (req, res) => {
+    const twoLevelsUp = path.join(__dirname, '..', '..');
+    res.sendFile(path.join(twoLevelsUp + '/client/node_security/dist/node_security/browser/index.html'));
+})
+router.get('/app-angular/googleLog', (req, res) => {
+    const twoLevelsUp = path.join(__dirname, '..', '..');
+    res.sendFile(path.join(twoLevelsUp + '/client/node_security/dist/node_security/browser/index.html'));
+})
+router.get('/app-angular/pswChange/:token', (req, res) => {
+    const twoLevelsUp = path.join(__dirname, '..', '..');
+    res.sendFile(path.join(twoLevelsUp + '/client/node_security/dist/node_security/browser/index.html'));
+})
+router.get('/app-angular/confirmRegistration/:token', (req, res) => {
+    const twoLevelsUp = path.join(__dirname, '..', '..');
+    res.sendFile(path.join(twoLevelsUp + '/client/node_security/dist/node_security/browser/index.html'));
+})
+
 module.exports = router;
