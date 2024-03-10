@@ -40,6 +40,8 @@ export class LoginComponent implements OnInit {
   }
 
   async onSubmit() {
+    console.log(this.form.value)
+    console.log(this.form)
     if (this.form.invalid) {
       this.invalidCredentials = true;
       return;

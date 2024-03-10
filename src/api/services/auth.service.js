@@ -18,9 +18,13 @@ const register = async (userData) => {
     if (error) {
         throw new Error(error.details[0].message);
     }
-    const userExists = await User.findOne({where: {email}});
-    if (userExists) {
+    const userExistsEmail = await User.findOne({where: {email}});
+    if (userExistsEmail) {
         throw new Error('L\'email è già in uso.');
+    }
+    const userExistsUsername = await User.findOne({where: {username}});
+    if (userExistsUsername) {
+        throw new Error('L\'username è già in uso.');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
@@ -47,7 +51,7 @@ const register = async (userData) => {
                         <h1>Clicca sul bottone qui sotto per confermare la tua registrazione!</h1>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; height: 200px;">
-                        <a href=\"${resetUrl}\">
+                        <a href=${resetUrl}>
                             <button style="border-radius: 1rem; background-color: blue; color: white; height: 50px" >
                                 Conferma Registrazione
                             </button>
@@ -180,7 +184,7 @@ const sendPasswordResetEmail = async (emailObj) => {
     <h1>Clicca sul bottone qui sotto per resettare la tua password!</h1>
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; height: 200px;">
-    <a href=\"${resetUrl}\">
+    <a href=${resetUrl}>
         <button style="border-radius: 1rem; background-color: blue; color: white; height: 50px" >
             Resetta Password
         </button>
@@ -196,7 +200,7 @@ const sendPasswordResetEmail = async (emailObj) => {
             }
         });
         
-        return 'Email per il reset della password inviata.';
+        return 'Ti abbiamo inviato una email con un link valido per il reset della password.';
     } catch (e) {
         throw new Error(e.message);
     }

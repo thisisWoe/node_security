@@ -1,6 +1,6 @@
 <div class="container-fluid home-wrapper">
   <form [formGroup]="this.form" (submit)="this.onSubmit()" class="row">
-    <button type="button" class="btn btn-outline-primary col-2 ms-4 my-3 btn-back" [routerLink]="['./../auth']">
+    <button type="button" class="btn btn-outline-primary col-2 ms-4 my-3 btn-back" (click)="navigateToLogin()">
       <svg fill="#007bff" width="30px" height="30px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -11,13 +11,6 @@
       </svg>
     </button>
 
-    <div class="col-12 d-flex justify-content-center">
-      <div class="form-floating mb-3 col-8">
-        <input type="text" class="form-control" formControlName="username" id="username-float"
-               placeholder="name@example.com">
-        <label for="username-float" class="ms-2">Username</label>
-      </div>
-    </div>
     <div class="col-12 d-flex justify-content-center">
       <div class="form-floating mb-3 col-8">
         <input [type]="showPassword ? 'text' : 'password'"
@@ -35,31 +28,47 @@
             </g>
           </svg>
         </button>
-        <label for="password-float" class="ms-2">Password</label>
+        <label for="password-float" class="ms-2">Nuova password</label>
       </div>
-
     </div>
     <div class="col-12 d-flex justify-content-center">
-      <a class="col-8 mb-3 forgot-psw" [routerLink]="['./../resetPsw']">Password dimenticata?</a>
+      <div class="form-floating mb-3 col-8">
+        <input type="password"
+               class="form-control" formControlName="confirmPassword" id="password-conf-float"
+               placeholder="name@example.com">
+        <label for="password-conf-float" class="ms-2">Conferma password</label>
+      </div>
     </div>
 
     <div class="col-12 d-flex justify-content-center">
       <div class="alert alert-danger col-8 mb-3" role="alert"
-           *ngIf="this.invalidCredentials">
-        Password e/o username non valido.
+           *ngIf="this.passwordInvalid && this.form.get('password')?.invalid">
+        La password deve avere almeno: 8 caratteri, 1 minuscola, 1 maiuscola, 1 numero e 1 carattere speciale.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.confPasswordInvalid && this.form.get('confirmPassword')?.invalid">
+        Le due password non coincidono.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="!this.token">
+        {{this.tokenError}}
       </div>
     </div>
 
     <div class="col-12 d-flex justify-content-center">
       <div class="alert alert-success col-8 mb-3" role="alert"
-           *ngIf="this.logged">
-        Ti sei loggato correttamente!
-        <br>Sarai reindirizzato alla pagina principale in <span class="num-confirm fs-5 fw-bold">5</span> secondi.
+           *ngIf="this.pswSubmitted">
+        {{ this.successText }}
+        <br>Sarai reindirizzato alla pagina di login in <span class="num-confirm fs-5 fw-bold">5</span> secondi.
       </div>
     </div>
 
     <div class="col-12 d-flex justify-content-center mb-3">
-      <button class="btn btn-success" type="submit" [disabled]="this.logged">Conferma</button>
+      <button class="btn btn-success" type="submit" [disabled]="!this.token">Conferma</button>
     </div>
 
   </form>

@@ -68,13 +68,19 @@
     <div class="col-12 d-flex justify-content-center">
       <div class="alert alert-danger col-8 mb-3" role="alert"
            *ngIf="this.passwordInvalid && this.form.get('password')?.invalid">
-        Lo username deve avere almeno: 8 caratteri, 1 minuscola, 1 maiuscola, 1 numero e 1 carattere speciale.
+        La password deve avere almeno: 8 caratteri, 1 minuscola, 1 maiuscola, 1 numero e 1 carattere speciale.
       </div>
     </div>
     <div class="col-12 d-flex justify-content-center">
       <div class="alert alert-danger col-8 mb-3" role="alert"
            *ngIf="this.confPasswordInvalid && this.form.get('confirmPassword')?.invalid">
         Le due password non coincidono.
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="alert alert-danger col-8 mb-3" role="alert"
+           *ngIf="this.serverError">
+        {{this.serverErrorText}}
       </div>
     </div>
     <div class="col-12 d-flex justify-content-center">

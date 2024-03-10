@@ -8,7 +8,7 @@ const registerUser = async (req, res) => {
             data: result,
         });
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: error.message});
     }
 };
 
@@ -58,7 +58,7 @@ const confirmRegistration = async (req, res) => {
             data: result
         })
     } catch (error) {
-        return res.status(500).send({message: "Errore durante la conferma della registrazione.\n" + error.message});
+        return res.status(500).send({message: "Errore durante la conferma della registrazione."});
     }
 };
 
@@ -70,7 +70,6 @@ const registerUserWithGoogle = async (req, res) => {
         try {
             const resRegistrationUserGoogle = await authService.registerWithGoogle(userInfo);
             const jwtToken = await authService.loginWithGoogle(resRegistrationUserGoogle.user.username);
-            
             res.cookie('authToken', jwtToken, {httpOnly: true, secure: true, sameSite: 'None'});
             res.redirect('http://localhost:4200/googleLog');
         } catch (e) {

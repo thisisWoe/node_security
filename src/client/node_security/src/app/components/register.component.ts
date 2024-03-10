@@ -3,6 +3,9 @@ import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, 
 import {AuthService} from "../services/auth.service";
 import {firstValueFrom} from "rxjs";
 import {Router} from "@angular/router";
+import {error} from "winston";
+import * as http from "http";
+import {HttpErrorResponse} from "@angular/common/http";
 
 export interface SignUpDTO {
   email: string,
@@ -23,6 +26,8 @@ export class RegisterComponent implements OnInit {
   confPasswordInvalid: boolean = false;
   showPassword: boolean = false;
   registered: boolean = false;
+  serverError: boolean = false;
+  serverErrorText: string | null | undefined = null;
 
   constructor(private fb: FormBuilder, private authSvc: AuthService, private router: Router) {
     this.form = this.fb.group({
@@ -77,14 +82,23 @@ export class RegisterComponent implements OnInit {
     }
 
     console.log(signUpDTO);
-    const resSignUp = await firstValueFrom(this.authSvc.signUp(signUpDTO));
-    console.log(resSignUp);
-    this.form.reset();
-    this.form.disable();
+    try {
+      const resSignUp = await firstValueFrom(this.authSvc.signUp(signUpDTO));
+      console.log(resSignUp);
+      this.form.reset();
+      this.form.disable();
 
-    this.registered = true;
-    setTimeout(() => {
-      this.router.navigate(['/auth']);
-    }, 5000)
+      this.registered = true;
+      setTimeout(() => {
+        this.router.navigate(['/auth']);
+      }, 5000)
+
+    } catch (error) {
+      const _error :HttpErrorResponse = error as HttpErrorResponse;
+      console.log(_error);
+      console.log(_error.error.error);
+      this.serverError = true;
+      this.serverErrorText = _error.error.message;
+    }
   }
 }

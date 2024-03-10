@@ -3,3 +3,10 @@ button.btn-back:hover {
     fill: white;
   }
 }
+
+a.forgot-psw{
+  text-decoration: none !important;
+  &:hover{
+    cursor: pointer;
+  }
+}

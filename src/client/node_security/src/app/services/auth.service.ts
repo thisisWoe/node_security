@@ -24,4 +24,19 @@ export class AuthService {
   signInGoogle() {
     return this.http.get(environment.API_URL + 'userinfo', {withCredentials: true});
   }
+
+  submitEmailResetPsw(email:string){
+    const dto = {email: email};
+    return this.http.post(environment.API_URL + 'reset-password', dto);
+  }
+
+  changePassword(token:string, newPassword:string){
+    const dto = {tokenJwt:token, newPassword:newPassword};
+    return this.http.post(environment.API_URL + 'change-password', dto);
+  }
+
+  confirmRegistration(token:string){
+    const dto = {tokenJwt:token};
+    return this.http.post(environment.API_URL + 'confirm-registration', dto);
+  }
 }
